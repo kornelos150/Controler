@@ -18,6 +18,8 @@ import javax.swing.table.AbstractTableModel;
 
 import bluethoothCtrl.BluetoothMock;
 import bluethoothCtrl.IBluethooth;
+import jssc.SerialPortException;
+import mainApp.GeneralConverter;
 
 public class ConfigTable extends BaseTile{
 
@@ -45,6 +47,10 @@ public class ConfigTable extends BaseTile{
 	private final int initInterval;
 	private final int initTimeout;
 	private final int initEncodetTime;
+	
+	private final short TimeoutID = 0;
+	private final short EncoderID = 1;
+	private final short TimerID = 2;
 	
 	private IBluethooth bluetooth;
 	private Timer timer;
@@ -147,13 +153,44 @@ public class ConfigTable extends BaseTile{
 		getConfigPD(result[0], result[1]);
 		return result;
 	}
-	private int setTimerInterval()
+	private int setTimerValue(short ID)
 	{
 		if(table.isEditing())
 			table.getCellEditor().stopCellEditing();
-		int res = Integer.parseInt((String)table.getValueAt(2, 3));
-		table.setValueAt(res, 2, 2);
+		int res =0;
+		if(ID == TimeoutID)
+		{
+			res = Integer.parseInt((String)table.getValueAt(2, 3));
+			table.setValueAt(res, 2, 2);
+		}
+		else if(ID == EncoderID)
+		{
+			res = Integer.parseInt((String)table.getValueAt(3, 3));
+			table.setValueAt(res, 3, 2);
+		}
+		else if(ID == TimerID)
+		{
+			res = Integer.parseInt((String)table.getValueAt(4, 3));
+			table.setValueAt(res, 4, 2);
+		}
 		return res;
+	}
+	
+	private void getTimerValue(short ID,int value)
+	{
+
+		if(ID == TimeoutID)
+		{
+			table.setValueAt(value, 2, 2);
+		}
+		else if(ID == EncoderID)
+		{
+			table.setValueAt(value, 3, 2);
+		}
+		else if(ID == TimerID)
+		{
+			table.setValueAt(value, 4, 2);
+		}
 	}
 	
 	private void getConfigPD(double Pval, double Dval)
@@ -162,15 +199,15 @@ public class ConfigTable extends BaseTile{
 		table.setValueAt(Dval, 1, 2);
 		
 	}
-
+	
 	class TableModel extends AbstractTableModel
 	{
 		private final String[] columnNames = {"Parameter", "Component", "Cur. Value", "To Set Val." };
 		private Object[][] data = { { "P", "Robot", initPval, initPval },
 				{ "D", "Robot", initDval, initDval },
-				{ "Timer", "Application", initInterval, initInterval },
 				{ "Timeout", "Robot", initTimeout, initTimeout },
-				{ "Encoder", "Robot", initEncodetTime, initEncodetTime }};
+				{ "Encoder", "Robot", initEncodetTime, initEncodetTime },
+				{ "Timer", "Application", initInterval, initInterval }};
 
 		@Override
 		public int getColumnCount() {
@@ -210,28 +247,76 @@ public class ConfigTable extends BaseTile{
 	{
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(e.equals(getConfigLabel))
+			if(bluetooth != null && timer != null)
 			{
-				
-			}else if(e.equals(setConfigLabel))
-			{
-				
-			}else if(e.equals(getTimeoutLabel))
-			{
-				
-			}else if(e.equals(setTimeoutLabel))
-			{
-				
-			}else if(e.equals(getEncoderLabel))
-			{
-				
-			}else if(e.equals(setEncoderLabel))
-			{
-				
-			}else if(e.equals(setTimerLabel))
-			{
-				
-			}
+				if(e.equals(getConfigLabel))
+				{
+					String tmp;
+					try {
+						tmp = bluetooth.getConfig();
+						
+					} catch (SerialPortException e1) {
+						tmp = "0.0!0.0";
+						e1.printStackTrace();
+					}
+					double[] val = GeneralConverter.deserializeStr2Dbl(tmp);
+					getConfigPD(val[0], val[1]);
+				}else if(e.equals(setConfigLabel))
+				{
+					double[] val = setConfigPD();
+					try {
+						bluetooth.setConfig(val[0], val[1]);
+					} catch (SerialPortException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}else if(e.equals(getTimeoutLabel))
+				{
+					String tmp;
+					try {
+						tmp = bluetooth.getTimeout();
+						
+					} catch (SerialPortException e1) {
+						tmp = "0";
+						e1.printStackTrace();
+					}
+					int[] val = GeneralConverter.deserializeStr2Int(tmp);
+					getTimerValue(TimeoutID, val[0]);
+				}else if(e.equals(setTimeoutLabel))
+				{
+					int val = setTimerValue(TimeoutID);
+					try {
+						bluetooth.setTimeout(val);
+					} catch (SerialPortException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}else if(e.equals(getEncoderLabel))
+				{
+					String tmp;
+					try {
+						tmp = bluetooth.getEncoderMeas();
+						
+					} catch (SerialPortException e1) {
+						tmp = "0";
+						e1.printStackTrace();
+					}
+					int[] val = GeneralConverter.deserializeStr2Int(tmp);
+					getTimerValue(EncoderID, val[0]);
+				}else if(e.equals(setEncoderLabel))
+				{
+					int val = setTimerValue(EncoderID);
+					try {
+						bluetooth.setEncoderMeas(val);
+					} catch (SerialPortException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}else if(e.equals(setTimerLabel))
+				{
+					timer.setDelay(setTimerValue(TimerID));
+				}
+			}else { System.err.println("BT and Tiemr are NULL");}
 		}
 	}
 

@@ -46,9 +46,6 @@ public class BTHandler {
 	private final ActionEvent startTimerEvent = new ActionEvent(this, 2, "startTimer");
 	private Interval interval;
 	
-	private SetConfigListener setConfigListener;
-	private GetConfigListener getConfigListener;
-	private SetTimerListener setTimerListener;
 	
 	public BTHandler() {
 		
@@ -70,10 +67,7 @@ public class BTHandler {
 //		}
 		
 		this.bluethooth = BluetoothMock.getInstance();
-			
-		setConfigListener = new SetConfigListener();
-		getConfigListener = new GetConfigListener();
-		setTimerListener = new SetTimerListener();
+		
 	}
 	
 	public void activeTile(BaseTile tile)
@@ -87,6 +81,9 @@ public class BTHandler {
 		{
 			removeConfigCtrlObs();
 			addConfigObs(tile);
+			tile.getBTControl(bluethooth);
+			tile.getTimerControl(timer);
+			
 		}else if(tile.isPWMCtrl())
 		{
 			removeConfigCtrlObs();
@@ -246,53 +243,7 @@ public class BTHandler {
 		}
 		
 	}
-	
-	private class SetConfigListener implements ActionListener
-	{
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			double[] val = configTile.setConfigPD();
-			try {
-				bluethooth.setConfig(val[0], val[1]);
-			} catch (SerialPortException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-		}
-		
-	}
-	
-	private class GetConfigListener implements ActionListener
-	{
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			String tmp;
-			try {
-				tmp = bluethooth.getConfig();
-				
-			} catch (SerialPortException e1) {
-				tmp = "0.0!0.0";
-				e1.printStackTrace();
-			}
-			double[] val = GeneralConverter.deserializeStr2Dbl(tmp);
-			configTile.getConfigPD(val[0], val[1]);
-		}
-		
-	}
-	
-	private class SetTimerListener implements ActionListener
-	{
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			interval.setInterval(configTile.setTimerInterval());
-			timer.setDelay(configTile.setTimerInterval());
-		}
-		
-	}
 	
 	private class TryStartTimer implements ActionListener
 	{
