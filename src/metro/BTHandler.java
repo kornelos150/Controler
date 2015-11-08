@@ -19,7 +19,7 @@ public class BTHandler {
 
 	public class Interval 
 	{
-		private int interval = 200;
+		private int interval = 100;
 
 		public int getInterval() {
 			return interval;
@@ -63,13 +63,15 @@ public class BTHandler {
 		
 		timer = new Timer(interval.getInterval(),new Task());
 		
-		try {
-			this.bluethooth = BluetoothImp.getInstance();
-		} catch (SerialPortException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			this.bluethooth = BluetoothImp.getInstance();
+//		} catch (SerialPortException e) {
+//			 TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
+		this.bluethooth = BluetoothMock.getInstance();
+			
 		setConfigListener = new SetConfigListener();
 		getConfigListener = new GetConfigListener();
 		setTimerListener = new SetTimerListener();
@@ -87,6 +89,10 @@ public class BTHandler {
 			removeConfigCtrlObs();
 			configTile = (ConfigTile) tile;
 			addConfigObs(tile);
+		}else if(tile.isPWMCtrl())
+		{
+			removeConfigCtrlObs();
+			addSetPWMObs(tile);
 		}else
 		{
 			if(tile.getType() == BaseTile.Type.SPEEDVISIO)
@@ -97,7 +103,7 @@ public class BTHandler {
 	
 	public void deactiveTile(BaseTile tile)
 	{	
-		if(tile.isConfig() || tile.isCtrl())
+		if(tile.isCtrlConfType())
 			removeConfigCtrlObs();
 		else if(tile.getType() == BaseTile.Type.SPEEDVISIO)
 			removeGetSpeedObs(tile);
@@ -140,6 +146,12 @@ public class BTHandler {
 		tryStartTimer.actionPerformed(startTimerEvent);
 	}
 	
+	private void addSetPWMObs(BTObserver tile)
+	{
+		setPWMObs = tile;
+		tryStartTimer.actionPerformed(startTimerEvent);
+	}
+	
 	private void removeConfigCtrlObs()
 	{
 		if(configObs != null)
@@ -155,6 +167,17 @@ public class BTHandler {
 		{
 			setSpeedObs.deactivate();
 			setSpeedObs = null;
+			tryStopTimer.actionPerformed(stopTimerEvent);
+			try {
+				bluethooth.setVelocity(0.0, 0.0, 0);
+			} catch (SerialPortException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}else if(setPWMObs != null)
+		{
+			setPWMObs.deactivate();
+			setPWMObs = null;
 			tryStopTimer.actionPerformed(stopTimerEvent);
 			try {
 				bluethooth.setVelocity(0.0, 0.0, 0);
@@ -295,7 +318,7 @@ public class BTHandler {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(getSpeedObs.isEmpty() && setSpeedObs == null)
+			if(getSpeedObs.isEmpty() && setSpeedObs == null && setPWMObs == null)
 				timer.stop();
 		}
 		

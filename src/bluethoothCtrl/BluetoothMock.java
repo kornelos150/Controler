@@ -28,7 +28,7 @@ public class BluetoothMock implements IBluethooth {
 
 	private static BluetoothMock instance;
 	
-	public static BluetoothMock getInstance() throws SerialPortException
+	public static BluetoothMock getInstance()
 	{
 		if(instance == null)
 			instance = new BluetoothMock();

@@ -180,12 +180,17 @@ public class BaseTile extends JPanel implements BTObserver{
 	
 	public Boolean isCtrlConfType()
 	{
-		return ( (type == Type.CONTROL) || (type == Type.CONFIG) );
+		return ( (type == Type.CONTROL) || (type == Type.CONFIG) || (type == Type.PWM_CONTROL));
 	}
 	
 	public Boolean isCtrl()
 	{
 		return (type == Type.CONTROL);
+	}
+	
+	public Boolean isPWMCtrl()
+	{
+		return (type == Type.PWM_CONTROL);
 	}
 	
 	public Boolean isConfig()
