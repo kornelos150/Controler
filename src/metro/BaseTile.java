@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -46,7 +47,7 @@ public class BaseTile extends JPanel implements BTObserver{
 	
 	private Boolean presentFlag;
 	private Boolean activeFlag;
-	
+		
 	public static Dimension getDimension()
 	{
 		return dimension;
@@ -74,7 +75,7 @@ public class BaseTile extends JPanel implements BTObserver{
 	
 	@Override
 	public double[] update(double[] input) {
-		// TODO Auto-generated method stub
+		// TO IMPLEMENT IN SPECIFIC TILES
 		return null;
 	}
 
@@ -103,6 +104,17 @@ public class BaseTile extends JPanel implements BTObserver{
 		activeButton.setText("DEACTIVE");
 	}
 	
+	@Override
+	public void getBTControl(IBluethooth bluetooth) {
+		// NO BT CONTROL IS DEFAULT VALUE
+	}
+	
+	@Override
+	public void getTimerControl(Timer timer){
+		//NO TIMER CONTROL IS DEFAULT VALUE
+	}
+
+
 	private void setBorder(String name)
 	{
 		Border raisedbevel = BorderFactory.createRaisedBevelBorder();

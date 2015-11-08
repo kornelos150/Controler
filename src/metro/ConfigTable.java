@@ -2,28 +2,52 @@ package metro;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.peer.ButtonPeer;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 
 import bluethoothCtrl.BluetoothMock;
 import bluethoothCtrl.IBluethooth;
 
-public class ConfigTable extends BaseTile implements ConfigTile{
+public class ConfigTable extends BaseTile{
 
 	private JTable table;
 	JButton btnGetConfig;
 	JButton btnSetConfig;
+	JButton btnGetTimeout;
+	JButton btnSetTimeout;
+	JButton btnGetEncoder;
+	JButton btnSetEncoder;
 	JButton btnSetTimer;
+	JPanel buttonPanel;
+	ActionListener buttonListener;
+	
+	private final String getConfigLabel = "Get Config";
+	private final String setConfigLabel = "Set Config";
+	private final String getTimeoutLabel = "Get Timeout";
+	private final String setTimeoutLabel = "Set Timeout";
+	private final String getEncoderLabel = "Get Enc. Meas.";
+	private final String setEncoderLabel = "Set Enc. Meas.";
+	private final String setTimerLabel = "Set Timer";
 	
 	private final double initPval;
 	private final double initDval;
 	private final int initInterval;
 	private final int initTimeout;
+	private final int initEncodetTime;
+	
+	private IBluethooth bluetooth;
+	private Timer timer;
 	
 	public ConfigTable(String name) {
 		super(name);
@@ -32,7 +56,8 @@ public class ConfigTable extends BaseTile implements ConfigTile{
 		initPval = 0.5;
 		initDval = 0.5;
 		initInterval = 500;
-		initTimeout = 700;
+		initTimeout = 0;
+		initEncodetTime = 60;
 		table.setModel(new TableModel());
 	}
 	
@@ -42,84 +67,43 @@ public class ConfigTable extends BaseTile implements ConfigTile{
 		
 		table = new JTable();
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setBounds(10, 11, 263, 152);
+		scrollPane.setBounds(10, 11, 263, 132);
 		table.setFillsViewportHeight(true);
 		getContent().add(scrollPane);
 		
-		btnGetConfig = new JButton("Get Config");
-		btnGetConfig.setBounds(164, 186, 109, 23);
-		getContent().add(btnGetConfig);
+		buttonListener = new UnivarsalListener();
 		
-		btnSetConfig = new JButton("Set Config");
-		btnSetConfig.setBounds(10, 186, 109, 23);
-		getContent().add(btnSetConfig);
+		buttonPanel = new JPanel(new GridLayout(4,2));
+		buttonPanel.setBounds(10, 154, 263, 85);
+		getContent().add(buttonPanel);
 		
-		btnSetTimer = new JButton("Set Timer");
-		btnSetTimer.setBounds(10, 216, 109, 23);
-		getContent().add(btnSetTimer);
+		addButton(btnGetConfig, getConfigLabel);
+		addButton(btnSetConfig, setConfigLabel);
+		addButton(btnGetTimeout, getTimeoutLabel);
+		addButton(btnSetTimeout, setTimeoutLabel);
+		addButton(btnGetEncoder, getEncoderLabel);
+		addButton(btnSetEncoder, setEncoderLabel);
+		addButton(btnSetTimer, setTimerLabel);
 	}
 	
-	@Override
-	public void addGetConfigListener(ActionListener listener)
+	private void addButton(JButton button,String name)
 	{
-		btnGetConfig.addActionListener(listener);
-	}
-	@Override
-	public void removeGetConfigListener(ActionListener listener)
-	{
-		btnGetConfig.removeActionListener(listener);
-	}
-	@Override
-	public void addSetConfigListener(ActionListener listener)
-	{
-		btnSetConfig.addActionListener(listener);
-	}
-	@Override
-	public void removeSetConfigListener(ActionListener listener)
-	{
-		btnSetConfig.removeActionListener(listener);
-	}
-	
-	@Override
-	public void addSetTimerListener(ActionListener listener)
-	{
-		btnSetTimer.addActionListener(listener);
-	}
-	
-	@Override
-	public void removeSetTimerListener(ActionListener listener)
-	{
-		btnSetTimer.removeActionListener(listener);
-	}
-	
-	
-	
-	@Override
-	public void getTimeout(int timeout) {
-		// TODO Auto-generated method stub
-		
+		button = new JButton(name);
+		buttonPanel.add(button);
+		button.addActionListener(buttonListener);
 	}
 
 	@Override
-	public double[] setTimeout() {
-		// TODO Auto-generated method stub
-		return null;
+	public void getBTControl(IBluethooth bluetooth) {
+		this.bluetooth = bluetooth;
 	}
 
 	@Override
-	public void addSetTimeoutListener(ActionListener listener) {
-		// TODO Auto-generated method stub
-		
+	public void getTimerControl(Timer timer) {
+		this.timer = timer;
 	}
 
-	@Override
-	public void removeSetTimeoutListener(ActionListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public double[] setConfigPD()
+	private double[] setConfigPD()
 	{
 		if(table.isEditing())
 			table.getCellEditor().stopCellEditing();
@@ -129,8 +113,7 @@ public class ConfigTable extends BaseTile implements ConfigTile{
 		getConfigPD(result[0], result[1]);
 		return result;
 	}
-	@Override
-	public int setTimerInterval()
+	private int setTimerInterval()
 	{
 		if(table.isEditing())
 			table.getCellEditor().stopCellEditing();
@@ -139,8 +122,7 @@ public class ConfigTable extends BaseTile implements ConfigTile{
 		return res;
 	}
 	
-	@Override
-	public void getConfigPD(double Pval, double Dval)
+	private void getConfigPD(double Pval, double Dval)
 	{
 		table.setValueAt(Pval, 0, 2);
 		table.setValueAt(Dval, 1, 2);
@@ -153,7 +135,8 @@ public class ConfigTable extends BaseTile implements ConfigTile{
 		private Object[][] data = { { "P", "Robot", initPval, initPval },
 				{ "D", "Robot", initDval, initDval },
 				{ "Timer", "Application", initInterval, initInterval },
-				{ "Timeout", "Robot", initDval, initDval }};
+				{ "Timeout", "Robot", initTimeout, initTimeout },
+				{ "Encoder", "Robot", initEncodetTime, initEncodetTime }};
 
 		@Override
 		public int getColumnCount() {
@@ -187,6 +170,35 @@ public class ConfigTable extends BaseTile implements ConfigTile{
 		}
 		
 		
+	}
+	
+	public class UnivarsalListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(e.equals(getConfigLabel))
+			{
+				
+			}else if(e.equals(setConfigLabel))
+			{
+				
+			}else if(e.equals(getTimeoutLabel))
+			{
+				
+			}else if(e.equals(setTimeoutLabel))
+			{
+				
+			}else if(e.equals(getEncoderLabel))
+			{
+				
+			}else if(e.equals(setEncoderLabel))
+			{
+				
+			}else if(e.equals(setTimerLabel))
+			{
+				
+			}
+		}
 	}
 
 	public static void main(String[] args) {

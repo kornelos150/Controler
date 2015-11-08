@@ -37,7 +37,6 @@ public class BTHandler {
 	private BTObserver setSpeedObs;
 	private BTObserver setPWMObs;
 	private BTObserver configObs;
-	private ConfigTile configTile;
 	
 	private Timer timer;
 	private Task task;
@@ -87,7 +86,6 @@ public class BTHandler {
 		}else if(tile.isConfig())
 		{
 			removeConfigCtrlObs();
-			configTile = (ConfigTile) tile;
 			addConfigObs(tile);
 		}else if(tile.isPWMCtrl())
 		{
@@ -120,8 +118,8 @@ public class BTHandler {
 	public void deactivateCtrlConf()
 	{
 		deactiveTile((BaseTile)setSpeedObs);
-		deactiveTile((BaseTile)configTile);
-		
+		deactiveTile((BaseTile)configObs);
+		deactiveTile((BaseTile)setPWMObs);
 	}
 	
 	public void hardTimerStop()
@@ -158,10 +156,6 @@ public class BTHandler {
 		{
 			configObs.deactivate();
 			configObs = null;
-			configTile.removeGetConfigListener(getConfigListener);
-			configTile.removeSetConfigListener(setConfigListener);
-			configTile.removeSetTimerListener(setTimerListener);
-			configTile = null;
 			
 		}else if(setSpeedObs != null)
 		{
@@ -188,13 +182,6 @@ public class BTHandler {
 		}
 	}
 	
-	private void addConfigObs(BTObserver tile)
-	{
-		configTile.addGetConfigListener(getConfigListener);
-		configTile.addSetConfigListener(setConfigListener);
-		configTile.addSetTimerListener(setTimerListener);
-		configObs = tile;  
-	}
 	
 	private void removeGetSpeedObs(BTObserver tile)
 	{
