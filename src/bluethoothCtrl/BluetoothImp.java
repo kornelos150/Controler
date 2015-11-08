@@ -260,7 +260,7 @@ public class BluetoothImp implements IBluethooth{
 	@Override
 	public String setControlFlag(byte flag) throws SerialPortException {
 		byte[] message = prepareMessage();
-		message[1] = 11;
+		message[1] = 12;
 		message[2] = flag;
 		
 		printMessage(message);
@@ -277,7 +277,7 @@ public class BluetoothImp implements IBluethooth{
 	@Override
 	public String getSetSpeed() throws SerialPortException {
 		byte[] message = prepareMessage();
-		message[1] = 12;
+		message[1] = 11;
 		printMessage(message);
 		port.writeBytes(message);
 		byte[] response = port.readBytes(10);
