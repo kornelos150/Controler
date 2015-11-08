@@ -90,7 +90,27 @@ public class ConfigTable extends BaseTile{
 	{
 		button = new JButton(name);
 		buttonPanel.add(button);
-		button.addActionListener(buttonListener);
+	}
+	
+	private void addListener(){
+		btnGetConfig.addActionListener(buttonListener);
+		btnSetConfig.addActionListener(buttonListener);
+		btnGetTimeout.addActionListener(buttonListener);
+		btnSetTimeout.addActionListener(buttonListener);
+		btnGetEncoder.addActionListener(buttonListener);
+		btnSetEncoder.addActionListener(buttonListener);
+		btnSetTimer.addActionListener(buttonListener);
+	}
+	
+	private void removeListener()
+	{
+		btnGetConfig.removeActionListener(buttonListener);
+		btnSetConfig.removeActionListener(buttonListener);
+		btnGetTimeout.removeActionListener(buttonListener);
+		btnSetTimeout.removeActionListener(buttonListener);
+		btnGetEncoder.removeActionListener(buttonListener);
+		btnSetEncoder.removeActionListener(buttonListener);
+		btnSetTimer.removeActionListener(buttonListener);
 	}
 
 	@Override
@@ -101,6 +121,20 @@ public class ConfigTable extends BaseTile{
 	@Override
 	public void getTimerControl(Timer timer) {
 		this.timer = timer;
+	}
+	
+	
+
+	@Override
+	public void activate() {
+		addListener();
+		super.activate();
+	}
+
+	@Override
+	public void deactivate() {
+		removeListener();
+		super.deactivate();
 	}
 
 	private double[] setConfigPD()

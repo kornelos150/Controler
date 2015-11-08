@@ -144,6 +144,11 @@ public class BTHandler {
 		tryStartTimer.actionPerformed(startTimerEvent);
 	}
 	
+	private void addConfigObs(BTObserver tile)
+	{
+		configObs = tile;
+	}
+	
 	private void addSetPWMObs(BTObserver tile)
 	{
 		setPWMObs = tile;
