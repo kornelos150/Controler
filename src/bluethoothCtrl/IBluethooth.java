@@ -15,7 +15,10 @@ public interface IBluethooth {
 	public String getPWM() throws SerialPortException;
 	public String setEncoderMeas(int time) throws SerialPortException;
 	public String getEncoderMeas() throws SerialPortException;
-	public String setControlFlag(byte flag) throws SerialPortException;
+	public String setRegulationTimer(int time) throws SerialPortException;
+	public String getRegulationTimer() throws SerialPortException;
+	public String setMotorDirection(byte bitmap) throws SerialPortException;
+	public String getMotorDirection() throws SerialPortException;
 	public String getSetSpeed() throws SerialPortException;
 
 }

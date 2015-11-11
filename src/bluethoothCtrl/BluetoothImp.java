@@ -255,22 +255,39 @@ public class BluetoothImp implements IBluethooth{
 		tmp[1] = response[3];
 		return String.valueOf(GeneralConverter.byte2int(tmp));
 	}
-
-
+	
 	@Override
-	public String setControlFlag(byte flag) throws SerialPortException {
+	public String setRegulationTimer(int time) throws SerialPortException {
 		byte[] message = prepareMessage();
 		message[1] = 12;
-		message[2] = flag;
-		
-		printMessage(message);
+		byte[] timeBytes = GeneralConverter.int2byte(time);
+		message[2] = timeBytes[0];
+		message[3] = timeBytes[1];
 		
 		port.writeBytes(message);
 		byte[] response = port.readBytes(10);
 		
 		printMessage(response);
-		return String.valueOf(response[2]);
+		byte[] tmp = new byte[2];
+		tmp[0] = response[2];
+		tmp[1] = response[3];
+		return String.valueOf(GeneralConverter.byte2int(tmp));
+	}
+
+
+	@Override
+	public String getRegulationTimer() throws SerialPortException {
+		byte[] message = prepareMessage();
+		message[1] = 13;
+
+		port.writeBytes(message);
+		byte[] response = port.readBytes(10);
 		
+		printMessage(response);
+		byte[] tmp = new byte[2];
+		tmp[0] = response[2];
+		tmp[1] = response[3];
+		return String.valueOf(GeneralConverter.byte2int(tmp));
 	}
 
 
@@ -284,6 +301,32 @@ public class BluetoothImp implements IBluethooth{
 		
 		printMessage(response);
 		return decodeMessageTransformWrkd(response);
+	}
+	
+	@Override
+	public String setMotorDirection(byte bitmap) throws SerialPortException {
+		byte[] message = prepareMessage();
+		message[1] = 14;
+		message[2] = bitmap;
+		
+		port.writeBytes(message);
+		byte[] response = port.readBytes(10);
+		
+		printMessage(response);
+		return String.valueOf(response[2]);
+	}
+
+
+	@Override
+	public String getMotorDirection() throws SerialPortException {
+		byte[] message = prepareMessage();
+		message[1] = 14;
+
+		port.writeBytes(message);
+		byte[] response = port.readBytes(10);
+		
+		printMessage(response);
+		return String.valueOf(response[2]);
 	}
 
 

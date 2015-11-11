@@ -83,11 +83,29 @@ function RobotGetEncoder()
 	var result = btObject.getEncoderMeas();
 	return parseInt(result);
 }
-function RobotSetControl(flag)
+function RobotSetRegTim(time)
 {
-	var result = btObject.setControlFlag(flag);
+	var result = btObject.setRegulationTimer(time);
 	return parseInt(result);
 }
+
+function RobotGetRegTim()
+{
+	var result = btObject.getRegulationTimer();
+	return parseInt(result);
+}
+
+function RobotSetDirection(bitmap)
+{
+	var result = btObject.setMotorDirection(bitmap);
+	return parseInt(result);
+}
+function RobotGetDirection()
+{
+	var result = btObject.getMotorDirection();
+	return parseInt(result);
+}
+
 function RobotGetSetSpeed()
 {
 	var result = btObject.getSetSpeed();

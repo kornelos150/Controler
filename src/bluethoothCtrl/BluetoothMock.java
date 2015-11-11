@@ -25,6 +25,8 @@ public class BluetoothMock implements IBluethooth {
 	private double rightSetSpeed = 2.0;
 	private byte controlFlag = 0;
 	private int encoderTimer = 10000;
+	private int regulationTimer = 10000;
+	private byte directionBitmap = 0;
 
 	private static BluetoothMock instance;
 	
@@ -132,17 +134,36 @@ public class BluetoothMock implements IBluethooth {
 		return String.valueOf(encoderTimer);
 	}
 
+	@Override
+	public String setRegulationTimer(int time) throws SerialPortException {
+		regulationTimer = time;
+		return String.valueOf(time);
+	}
+
 
 	@Override
-	public String setControlFlag(byte flag) throws SerialPortException {
-		controlFlag = flag;
-		return String.valueOf(flag);
+	public String getRegulationTimer() throws SerialPortException {
+		return String.valueOf(regulationTimer);
 	}
+	
 
 
 	@Override
 	public String getSetSpeed() throws SerialPortException {
 		return GeneralConverter.serializeDbl2Str(leftSetSpeed, rightSetSpeed);
+	}
+	
+
+	@Override
+	public String setMotorDirection(byte bitmap) throws SerialPortException {
+		directionBitmap = bitmap;
+		return String.valueOf(bitmap);
+	}
+
+
+	@Override
+	public String getMotorDirection() throws SerialPortException {
+		return String.valueOf(directionBitmap);
 	}
 
 
