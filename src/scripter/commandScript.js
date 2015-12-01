@@ -1,5 +1,5 @@
-var BluethoothClass = Java.type('bluethoothCtrl.BluetoothImp');
-//var BluethoothClass = Java.type('bluethoothCtrl.BluetoothMock');
+//var BluethoothClass = Java.type('bluethoothCtrl.BluetoothImp');
+var BluethoothClass = Java.type('bluethoothCtrl.BluetoothMock');
 var btObject = BluethoothClass.getInstance();
 
 function decode(text)
@@ -27,6 +27,12 @@ function decodeInt(text)
 function RobotSetVel(translate,rotate,time)
 {
 	var result = btObject.setVelocity(translate,rotate,time);
+	return decode(result);
+}
+
+function RobotSetVelWait(translate,rotate,time)
+{
+	var result = btObject.setVelocityWait(translate,rotate,time);
 	return decode(result);
 }
 
@@ -63,6 +69,12 @@ function RobotGetTimeout()
 function RobotSetPWM(left,right,time)
 {
 	var result = btObject.setPWM(left,right,time);
+	return decodeInt(result);
+}
+
+function RobotSetPWMWait(left,right,time)
+{
+	var result = btObject.setPWMWait(left,right,time);
 	return decodeInt(result);
 }
 
@@ -110,4 +122,10 @@ function RobotGetSetSpeed()
 {
 	var result = btObject.getSetSpeed();
 	return decode(result);
+}
+
+function RobotGetEncoderTicks()
+{
+	var result = btObject.getEncoderTicks();
+	return decodeInt(result);
 }

@@ -19,7 +19,7 @@ public class BTHandler {
 
 	public class Interval 
 	{
-		private int interval = 100;
+		private int interval = 300;
 
 		public int getInterval() {
 			return interval;
@@ -31,7 +31,7 @@ public class BTHandler {
 		
 	}
 	
-	private IBluethooth bluethooth;
+	private IBluethooth bluetooth;
 	
 	private ActionList getSpeedObs;
 	private BTObserver setSpeedObs;
@@ -60,13 +60,13 @@ public class BTHandler {
 		timer = new Timer(interval.getInterval(),new Task());
 		
 //		try {
-//			this.bluethooth = BluetoothImp.getInstance();
+//			this.bluetooth = BluetoothImp.getInstance();
 //		} catch (SerialPortException e) {
-//			 TODO Auto-generated catch block
+//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
 		
-		this.bluethooth = BluetoothMock.getInstance();
+		this.bluetooth = BluetoothMock.getInstance();
 		
 	}
 	
@@ -76,12 +76,20 @@ public class BTHandler {
 		{
 			removeConfigCtrlObs();
 			addSetSpeedObs(tile);
+			try {
+				String tmp = bluetooth.getRegulationTimer();
+				if(Integer.parseInt(tmp) == 0)
+					bluetooth.setRegulationTimer(interval.getInterval()/2);
+			} catch (SerialPortException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		}else if(tile.isConfig())
 		{
 			removeConfigCtrlObs();
 			addConfigObs(tile);
-			tile.getBTControl(bluethooth);
+			tile.getBTControl(bluetooth);
 			tile.getTimerControl(timer);
 			
 		}else if(tile.isPWMCtrl())
@@ -98,8 +106,10 @@ public class BTHandler {
 	
 	public void deactiveTile(BaseTile tile)
 	{	
-		if(tile.isCtrlConfType())
-			removeConfigCtrlObs();
+		if(tile.isCtrl())
+			setSpeedObs = null;
+		else if(tile.isConfig())
+			configObs = null;
 		else if(tile.getType() == BaseTile.Type.SPEEDVISIO)
 			removeGetSpeedObs(tile);
 		
@@ -128,7 +138,7 @@ public class BTHandler {
 	public void sentStop()
 	{
 		try {
-			bluethooth.setVelocity(0.0, 0.0, 0);
+			bluetooth.setVelocity(0.0, 0.0, 0);
 		} catch (SerialPortException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -165,7 +175,7 @@ public class BTHandler {
 			setSpeedObs = null;
 			tryStopTimer.actionPerformed(stopTimerEvent);
 			try {
-				bluethooth.setVelocity(0.0, 0.0, 0);
+				bluetooth.setVelocity(0.0, 0.0, 0);
 			} catch (SerialPortException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -176,7 +186,7 @@ public class BTHandler {
 			setPWMObs = null;
 			tryStopTimer.actionPerformed(stopTimerEvent);
 			try {
-				bluethooth.setVelocity(0.0, 0.0, 0);
+				bluetooth.setVelocity(0.0, 0.0, 0);
 			} catch (SerialPortException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -188,6 +198,7 @@ public class BTHandler {
 	private void removeGetSpeedObs(BTObserver tile)
 	{
 		getSpeedObs.remove(tile);
+		
 	}
 	
 	private void addGetSpeedObs(BTObserver tile)
@@ -214,13 +225,13 @@ public class BTHandler {
 				if(setSpeedObs != null && currentVal == 0)
 				{
 					velocity = setSpeedObs.update(null);
-					bluethooth.setVelocity(velocity[0], velocity[1], 0);
+					bluetooth.setVelocity(velocity[0], velocity[1], 0);
 					System.out.println("SET Tr: "+velocity[0]+" Rot: "+ velocity[1]);
 
 				}
 				if(!getSpeedObs.isEmpty() && currentVal == 1)
 				{
-					String tmp = bluethooth.getVelocity();
+					String tmp = bluetooth.getVelocity();
 					velocity = GeneralConverter.deserializeStr2Dbl(tmp);
 					System.out.println("GET Tr: "+velocity[0]+" Rot: "+ velocity[1]);
 					for(BTObserver obs : getSpeedObs)
@@ -231,7 +242,7 @@ public class BTHandler {
 					velocity = setPWMObs.update(null);
 					int pwmL = (int)velocity[0];
 					int pwmR = (int)velocity[1];
-					bluethooth.setPWM(pwmL, pwmR, 0);
+					bluetooth.setPWM(pwmL, pwmR, 0);
 					System.out.println("SET PWM LEFT: "+pwmL+" RIGHT: "+ pwmR);
 
 				}

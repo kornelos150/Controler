@@ -20,13 +20,14 @@ import javax.swing.border.LineBorder;
 
 import bluethoothCtrl.BluetoothMock;
 import bluethoothCtrl.IBluethooth;
+import mainApp.GeneralConverter;
 
 public class Speedometer extends BaseTile{
 
 	private static int TRANS = 0;
 	private static int ROT = 1;
-	private static int RIGHT = 0;
-	private static int LEFT = 1;
+	private static int LEFT = 0;
+	private static int RIGHT = 1;
 	
 	private JPanel panel;
 	private JPanel panelButtons;
@@ -46,6 +47,8 @@ public class Speedometer extends BaseTile{
 	
 	private double velocity[];
 	private String formText[];
+	private String formTextTR[];
+	private String formTextLR[];
 	
 	private double multiplier = 1.0;
 	
@@ -53,6 +56,7 @@ public class Speedometer extends BaseTile{
 	public double[] update(double[] input) {
 		unitChanger(input);
 		formChanger(input);
+		System.out.println(String.format("Konwertuje left: %f righr %f",input[0],input[1]));
 		velocity = input;
 		speedPanel.repaint();
 		return input;
@@ -72,9 +76,15 @@ public class Speedometer extends BaseTile{
 		velocity[TRANS] = 0.0;
 		velocity[ROT] = 0.0;
 		
-		formText = new String[2];
-		formText[TRANS] = "Trans.";
-		formText[ROT] = "Ratat.";
+		formTextTR = new String[2];
+		formTextTR[TRANS] = "Trans.";
+		formTextTR[ROT] = "Rotat.";
+		
+		formTextLR = new String[2];
+		formTextLR[LEFT] = "Left";
+		formTextLR[RIGHT] = "Right";
+		
+		formText = formTextTR;
 		
 		speedPanel.repaint();
 		
@@ -89,7 +99,14 @@ public class Speedometer extends BaseTile{
 	
 	private void formChanger(double[] vel)
 	{
-		//TO DO
+		if(formText == formTextLR)
+		{
+			double[] tmp = GeneralConverter.TranRot2LeftRight(vel[0], vel[1]);
+			vel[0] = tmp[0];
+			vel[1] = tmp[1];
+		}
+		
+
 
 	}
 	private void buttonPanelInit()
@@ -131,13 +148,17 @@ public class Speedometer extends BaseTile{
 		lblForm.setBounds(10, 130, 67, 14);
 		panelButtons.add(lblForm);
 		
+		FormListener formListener = new FormListener();
+		
 		rdbtnTR = new JRadioButton("T/R");
 		rdbtnTR.setBounds(6, 156, 65, 23);
 		rdbtnTR.setSelected(true);
+		rdbtnTR.addActionListener(formListener);
 		panelButtons.add(rdbtnTR);
 		
 		rdbtnRL = new JRadioButton("L/R");
 		rdbtnRL.setBounds(6, 182, 65, 23);
+		rdbtnRL.addActionListener(formListener);
 		panelButtons.add(rdbtnRL);
 		
 		formGroup = new ButtonGroup();
@@ -244,6 +265,24 @@ public class Speedometer extends BaseTile{
 				setShowUnit(rdbtnMs.getText());
 			}	
 			unitChanger(velocity);
+			speedPanel.repaint();
+		}
+		
+	}
+	
+	private class FormListener implements ActionListener
+	{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(rdbtnTR.isSelected())
+			{
+				formText = formTextTR;
+			}else if(rdbtnRL.isSelected())
+			{
+				formText = formTextLR;
+			}
+			formChanger(velocity);
 			speedPanel.repaint();
 		}
 		

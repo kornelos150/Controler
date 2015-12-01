@@ -228,7 +228,7 @@ public class BaseTile extends JPanel implements BTObserver{
 					BaseTile testTile = new BaseTile("Testowy");//,infotst);
 					testTile.upperBar.setVisible(true);
 					testTile.getContent().setBackground(Color.GREEN);
-					BaseTile testTile2 = new BaseTile("Testowy2");//,infotst);
+					BaseTile testTile2 = new BaseTile("BaseTile");//,infotst);
 					BaseTile testTile3 = new BaseTile("Testowy3");//,infotst);
 					JFrame testFrame = new JFrame();
 					testFrame.setMinimumSize(new Dimension(side + 30, side + 50));

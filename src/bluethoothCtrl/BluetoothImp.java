@@ -105,6 +105,29 @@ public class BluetoothImp implements IBluethooth{
 		
 	}
 
+	@Override
+	public String setVelocityWait(double translation, double rotation, int time) throws SerialPortException {
+		byte[] message = prepareMessage();
+		double[] vel_LR = GeneralConverter.TranRot2LeftRight(translation, rotation);
+		byte[] left = GeneralConverter.Double2Byte(vel_LR[0]);
+		byte[] right = GeneralConverter.Double2Byte(vel_LR[1]);
+		byte[] timeBytes = GeneralConverter.int2byte(time);
+		message[1] = 16;
+		message[2] = left[0];
+		message[3] = left[1];
+		message[5] = right[0];
+		message[6] = right[1];
+		message[7] = timeBytes[0];
+		message[8] = timeBytes[1];
+		printMessage(message);
+		
+		port.writeBytes(message);
+		byte[] response = port.readBytes(10);
+		port.readBytes(10);
+		
+		printMessage(response);
+		return decodeMessageTransformWrkd(response);
+	}
 
 	@Override
 	public String getVelocity() throws SerialPortException  {
@@ -208,6 +231,27 @@ public class BluetoothImp implements IBluethooth{
 		
 	}
 
+	@Override
+	public String setPWMWait(int left, int right, int time) throws SerialPortException {
+		byte[] message = prepareMessage();
+		byte[] leftBytes = GeneralConverter.int2byte(left);
+		byte[] rightBytes = GeneralConverter.int2byte(right);
+		byte[] timeBytes = GeneralConverter.int2byte(time);
+		message[1] = 17;
+		message[2] = leftBytes[0];
+		message[3] = leftBytes[1];
+		message[5] = rightBytes[0];
+		message[6] = rightBytes[1];
+		message[7] = timeBytes[0];
+		message[8] = timeBytes[1];
+		printMessage(message);
+		
+		port.writeBytes(message);
+		byte[] response = port.readBytes(10);
+		port.readBytes(10);
+		printMessage(response);
+		return decodeIntMessageWrkd(response);
+	}
 
 	@Override
 	public String getPWM() throws SerialPortException  {
@@ -327,6 +371,19 @@ public class BluetoothImp implements IBluethooth{
 		
 		printMessage(response);
 		return String.valueOf(response[2]);
+	}
+
+	@Override
+	public String getEncoderTicks() throws SerialPortException {
+		byte[] message = prepareMessage();
+		message[1] = 18;
+		printMessage(message);
+		
+		port.writeBytes(message);
+		byte[] response = port.readBytes(10);
+		
+		printMessage(response);
+		return decodeIntMessageWrkd(response);
 	}
 
 

@@ -24,33 +24,33 @@ import mainApp.GeneralConverter;
 public class ConfigTable extends BaseTile{
 
 	private JTable table;
-	JButton btnGetConfig;
-	JButton btnSetConfig;
-	JButton btnGetTimeout;
-	JButton btnSetTimeout;
-	JButton btnGetEncoder;
-	JButton btnSetEncoder;
-	JButton btnSetTimer;
+	private JButton btnGetAll;
+	private JButton btnSetConfig;
+	private JButton btnSetTimeout;
+	private JButton btnSetEncoder;
+	private JButton btnSetTimer;
+	private JButton btnSetRegulation;
 	JPanel buttonPanel;
 	ActionListener buttonListener;
 	
-	private final String getConfigLabel = "Get Config";
+	private final String getAllLabel = "Get All";
 	private final String setConfigLabel = "Set Config";
-	private final String getTimeoutLabel = "Get Timeout";
 	private final String setTimeoutLabel = "Set Timeout";
-	private final String getEncoderLabel = "Get Enc. Meas.";
 	private final String setEncoderLabel = "Set Enc. Meas.";
 	private final String setTimerLabel = "Set Timer";
+	private final String setRegulationLabel = "Set Regul.";
 	
 	private final double initPval;
 	private final double initDval;
 	private final int initInterval;
 	private final int initTimeout;
 	private final int initEncodetTime;
+	private final int initRegulationTime;
 	
 	private final short TimeoutID = 0;
 	private final short EncoderID = 1;
 	private final short TimerID = 2;
+	private final short RegulationID = 3;
 	
 	private IBluethooth bluetooth;
 	private Timer timer;
@@ -63,6 +63,7 @@ public class ConfigTable extends BaseTile{
 		initDval = 0.5;
 		initInterval = 500;
 		initTimeout = 0;
+		initRegulationTime = 150;
 		initEncodetTime = 60;
 		table.setModel(new TableModel());
 	}
@@ -83,40 +84,38 @@ public class ConfigTable extends BaseTile{
 		buttonPanel.setBounds(10, 154, 263, 85);
 		getContent().add(buttonPanel);
 		
-		addButton(btnGetConfig, getConfigLabel);
-		addButton(btnSetConfig, setConfigLabel);
-		addButton(btnGetTimeout, getTimeoutLabel);
-		addButton(btnSetTimeout, setTimeoutLabel);
-		addButton(btnGetEncoder, getEncoderLabel);
-		addButton(btnSetEncoder, setEncoderLabel);
-		addButton(btnSetTimer, setTimerLabel);
+		btnGetAll = addButton(getAllLabel);
+		btnSetConfig = addButton(setConfigLabel);
+		btnSetTimeout = addButton(setTimeoutLabel);
+		btnSetEncoder = addButton(setEncoderLabel);
+		btnSetTimer = addButton(setTimerLabel);
+		btnSetRegulation = addButton(setRegulationLabel);
 	}
 	
-	private void addButton(JButton button,String name)
+	private JButton addButton(String name)
 	{
-		button = new JButton(name);
+		JButton button = new JButton(name);
 		buttonPanel.add(button);
+		return button;
 	}
 	
 	private void addListener(){
-		btnGetConfig.addActionListener(buttonListener);
+		btnGetAll.addActionListener(buttonListener);
 		btnSetConfig.addActionListener(buttonListener);
-		btnGetTimeout.addActionListener(buttonListener);
 		btnSetTimeout.addActionListener(buttonListener);
-		btnGetEncoder.addActionListener(buttonListener);
 		btnSetEncoder.addActionListener(buttonListener);
 		btnSetTimer.addActionListener(buttonListener);
+		btnSetRegulation.addActionListener(buttonListener);
 	}
 	
 	private void removeListener()
 	{
-		btnGetConfig.removeActionListener(buttonListener);
+		btnGetAll.removeActionListener(buttonListener);
 		btnSetConfig.removeActionListener(buttonListener);
-		btnGetTimeout.removeActionListener(buttonListener);
 		btnSetTimeout.removeActionListener(buttonListener);
-		btnGetEncoder.removeActionListener(buttonListener);
 		btnSetEncoder.removeActionListener(buttonListener);
 		btnSetTimer.removeActionListener(buttonListener);
+		btnSetRegulation.removeActionListener(buttonListener);
 	}
 
 	@Override
@@ -126,6 +125,7 @@ public class ConfigTable extends BaseTile{
 
 	@Override
 	public void getTimerControl(Timer timer) {
+		System.out.println(timer == null ? "timer to null" : "timer git");
 		this.timer = timer;
 	}
 	
@@ -150,7 +150,6 @@ public class ConfigTable extends BaseTile{
 		double result[] = new double[2];
 		result[0] = Double.parseDouble((String)table.getValueAt(0, 3));
 		result[1] = Double.parseDouble((String)table.getValueAt(1, 3));
-		getConfigPD(result[0], result[1]);
 		return result;
 	}
 	private int setTimerValue(short ID)
@@ -161,17 +160,18 @@ public class ConfigTable extends BaseTile{
 		if(ID == TimeoutID)
 		{
 			res = Integer.parseInt((String)table.getValueAt(2, 3));
-			table.setValueAt(res, 2, 2);
 		}
 		else if(ID == EncoderID)
 		{
 			res = Integer.parseInt((String)table.getValueAt(3, 3));
-			table.setValueAt(res, 3, 2);
 		}
 		else if(ID == TimerID)
 		{
+			res = Integer.parseInt((String)table.getValueAt(5, 3));
+		}
+		else if(ID == RegulationID)
+		{
 			res = Integer.parseInt((String)table.getValueAt(4, 3));
-			table.setValueAt(res, 4, 2);
 		}
 		return res;
 	}
@@ -189,6 +189,10 @@ public class ConfigTable extends BaseTile{
 		}
 		else if(ID == TimerID)
 		{
+			table.setValueAt(value, 5, 2);
+		}
+		else if(ID == RegulationID)
+		{
 			table.setValueAt(value, 4, 2);
 		}
 	}
@@ -203,11 +207,12 @@ public class ConfigTable extends BaseTile{
 	class TableModel extends AbstractTableModel
 	{
 		private final String[] columnNames = {"Parameter", "Component", "Cur. Value", "To Set Val." };
-		private Object[][] data = { { "P", "Robot", initPval, initPval },
-				{ "D", "Robot", initDval, initDval },
-				{ "Timeout", "Robot", initTimeout, initTimeout },
-				{ "Encoder", "Robot", initEncodetTime, initEncodetTime },
-				{ "Timer", "Application", initInterval, initInterval }};
+		private Object[][] data = { { "P", "Robot", String.valueOf(initPval), String.valueOf((initPval)) },
+				{ "D", "Robot", String.valueOf((initDval)), String.valueOf((initDval)) },
+				{ "Timeout", "Robot", String.valueOf((initTimeout)), String.valueOf((initTimeout)) },
+				{ "Encoder", "Robot", String.valueOf((initEncodetTime)), String.valueOf((initEncodetTime)) },
+				{ "Regulation", "Robot", String.valueOf((initRegulationTime)), String.valueOf((initRegulationTime)) },
+				{ "Timer", "Application", String.valueOf((initInterval)), String.valueOf((initInterval)) }};
 
 		@Override
 		public int getColumnCount() {
@@ -247,74 +252,97 @@ public class ConfigTable extends BaseTile{
 	{
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(bluetooth != null && timer != null)
+			if(bluetooth != null)
 			{
-				if(e.equals(getConfigLabel))
+				String tmp;
+				if(e.getActionCommand().equals(getAllLabel))
 				{
-					String tmp;
+					String PD, timeout_, encoder_, regul_;
+					int timer_;
 					try {
-						tmp = bluetooth.getConfig();
+						PD = bluetooth.getConfig();
+						timeout_ = bluetooth.getTimeout();
+						encoder_ = bluetooth.getEncoderMeas();
+						regul_ = bluetooth.getRegulationTimer();
+						timer_ = timer.getDelay();
 						
+					} catch (SerialPortException e1) {
+						PD = "0.0!0.0";
+						timeout_ = "0";
+						encoder_ = "0";
+						regul_ = "0";
+						timer_ = 0;
+						e1.printStackTrace();
+					}
+					double[] val = GeneralConverter.deserializeStr2Dbl(PD);
+					getConfigPD(val[0], val[1]);
+					int res[] = GeneralConverter.deserializeStr2Int(timeout_);
+					getTimerValue(TimeoutID, res[0]);
+					res = GeneralConverter.deserializeStr2Int(encoder_);
+					getTimerValue(EncoderID, res[0]);
+					res = GeneralConverter.deserializeStr2Int(regul_);
+					getTimerValue(RegulationID, res[0]);
+					getTimerValue(TimerID, timer_);
+				}else if(e.getActionCommand().equals(setConfigLabel))
+				{
+					double[] val = setConfigPD();
+					
+					try {
+						bluetooth.setConfig(val[0], val[1]);
+						tmp = bluetooth.getConfig();
 					} catch (SerialPortException e1) {
 						tmp = "0.0!0.0";
 						e1.printStackTrace();
 					}
-					double[] val = GeneralConverter.deserializeStr2Dbl(tmp);
+					val = GeneralConverter.deserializeStr2Dbl(tmp);
 					getConfigPD(val[0], val[1]);
-				}else if(e.equals(setConfigLabel))
+				}else if(e.getActionCommand().equals(setTimeoutLabel))
 				{
-					double[] val = setConfigPD();
+					int val = setTimerValue(TimeoutID);
 					try {
-						bluetooth.setConfig(val[0], val[1]);
-					} catch (SerialPortException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}else if(e.equals(getTimeoutLabel))
-				{
-					String tmp;
-					try {
+						bluetooth.setTimeout(val);
 						tmp = bluetooth.getTimeout();
 						
 					} catch (SerialPortException e1) {
 						tmp = "0";
 						e1.printStackTrace();
 					}
-					int[] val = GeneralConverter.deserializeStr2Int(tmp);
-					getTimerValue(TimeoutID, val[0]);
-				}else if(e.equals(setTimeoutLabel))
+					int[] res = GeneralConverter.deserializeStr2Int(tmp);
+					getTimerValue(TimeoutID, res[0]);
+					
+				}else if(e.getActionCommand().equals(setEncoderLabel))
 				{
-					int val = setTimerValue(TimeoutID);
+					int val = setTimerValue(EncoderID);
 					try {
-						bluetooth.setTimeout(val);
-					} catch (SerialPortException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}else if(e.equals(getEncoderLabel))
-				{
-					String tmp;
-					try {
+						bluetooth.setEncoderMeas(val);
 						tmp = bluetooth.getEncoderMeas();
 						
 					} catch (SerialPortException e1) {
 						tmp = "0";
 						e1.printStackTrace();
 					}
-					int[] val = GeneralConverter.deserializeStr2Int(tmp);
-					getTimerValue(EncoderID, val[0]);
-				}else if(e.equals(setEncoderLabel))
+					int[] res = GeneralConverter.deserializeStr2Int(tmp);
+					getTimerValue(EncoderID, res[0]);
+					
+				}else if(e.getActionCommand().equals(setRegulationLabel))
 				{
-					int val = setTimerValue(EncoderID);
+					int val = setTimerValue(RegulationID);
 					try {
-						bluetooth.setEncoderMeas(val);
+						bluetooth.setRegulationTimer(val);
+						tmp = bluetooth.getRegulationTimer();
+						
 					} catch (SerialPortException e1) {
-						// TODO Auto-generated catch block
+						tmp = "0";
 						e1.printStackTrace();
 					}
-				}else if(e.equals(setTimerLabel))
+					int[] res = GeneralConverter.deserializeStr2Int(tmp);
+					getTimerValue(RegulationID, res[0]);
+					
+				}
+				else if(e.getActionCommand().equals(setTimerLabel))
 				{
 					timer.setDelay(setTimerValue(TimerID));
+					getTimerValue(TimerID, timer.getDelay());
 				}
 			}else { System.err.println("BT and Tiemr are NULL");}
 		}
@@ -326,6 +354,8 @@ public class ConfigTable extends BaseTile{
 				try {
 					//Info infotst = new Info();
 					BaseTile testTile = new ConfigTable("Testowy");//,infotst);
+					testTile.getBTControl(BluetoothMock.getInstance());
+					testTile.activate();
 					System.out.println("SIZE: "+ testTile.getContent().getSize());
 					JFrame testFrame = new JFrame();
 					int side = BaseTile.getSide();

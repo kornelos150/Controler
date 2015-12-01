@@ -23,11 +23,15 @@ import bluethoothCtrl.IBluethooth;
 
 public class MouseControl extends BaseTile {
 
-	private JTextField textField;
+	private JTextField textFieldTrans;
+	private JTextField textFieldRot;
 	private JLabel lblInitText;
-	private JLabel lblPrescalerpx;
-	private JLabel lblCms;
-	private JButton btnNewButton;
+	private JLabel lblPrescaleTrans;
+	private JLabel lblPrescaleRot;
+	private JLabel lblCmsTrans;
+	private JLabel lblCmsRot;
+	private JButton btnNewButtonTrans;
+	private JButton btnNewButtonRot;
 	private JPanel controlPanel;
 	
 	private final String initMessage = "Choose Starting Point by left clicking on area";
@@ -37,7 +41,8 @@ public class MouseControl extends BaseTile {
 	private Boolean isPointSetted = false;
 	private Point startPoint = new Point(0, 0); 
 	private JLabel lblSetvelocity;
-	private double prescaler = 0.01;
+	private double prescalerTrans = 0.01;
+	private double prescalerRot = 0.01;
 	
 	double translation;
 	double rotation;
@@ -65,29 +70,45 @@ void initComponents(){
 	lblInitText.setBounds(10, 2, 263, 14);
 	getContent().add(lblInitText);
 	
-	lblPrescalerpx = new JLabel("Prescaler 1px = ");
-	lblPrescalerpx.setBounds(10, 243-17, 104, 14);
-	getContent().add(lblPrescalerpx);
+	lblPrescaleTrans = new JLabel("Prescaler TR 1px = ");
+	lblPrescaleTrans.setBounds(0, 243-41, 115, 14);
+	getContent().add(lblPrescaleTrans);
 	
+	lblCmsRot = new JLabel("Prescaler RO 1px = ");
+	lblCmsRot.setBounds(0, 243-17, 115, 14);
+	getContent().add(lblCmsRot);
 	
+	textFieldTrans = new JTextField();
+	textFieldTrans.setBounds(116, 243-43, 37, 20);
+	textFieldTrans.setText(Double.toString(prescalerTrans));
+	getContent().add(textFieldTrans);
+	textFieldTrans.setColumns(10);
 	
-	textField = new JTextField();
-	textField.setBounds(114, 240-17, 37, 20);
-	textField.setText(Double.toString(prescaler));
-	getContent().add(textField);
-	textField.setColumns(10);
+	lblCmsTrans = new JLabel("cm /s");
+	lblCmsTrans.setBounds(161, 243-43, 46, 14);
+	getContent().add(lblCmsTrans);
 	
-	lblCms = new JLabel("cm /s");
-	lblCms.setBounds(161, 243-17, 46, 14);
-	getContent().add(lblCms);
+	btnNewButtonTrans = new JButton("Apply");
+	btnNewButtonTrans.setBounds(194, 243-43, 79, 23);
+	getContent().add(btnNewButtonTrans);
 	
-	btnNewButton = new JButton("Apply");
-	btnNewButton.setBounds(194, 239-17, 79, 23);
-	getContent().add(btnNewButton);
+	textFieldRot = new JTextField();
+	textFieldRot.setBounds(117, 243-17, 37, 20);
+	textFieldRot.setText(Double.toString(prescalerRot));
+	getContent().add(textFieldRot);
+	textFieldRot.setColumns(10);
+	
+	lblCmsRot = new JLabel("cm /s");
+	lblCmsRot.setBounds(161, 243-17, 46, 14);
+	getContent().add(lblCmsRot);
+	
+	btnNewButtonRot = new JButton("Apply");
+	btnNewButtonRot.setBounds(194, 243-17, 79, 23);
+	getContent().add(btnNewButtonRot);
 	
 	controlPanel = new JPanel();
 	controlPanel.setBorder(new LineBorder(Color.RED, 2, true));
-	controlPanel.setBounds(10, 23, 263, 209-17);
+	controlPanel.setBounds(10, 23, 263, 205-31);
 	getContent().add(controlPanel);
 	controlPanel.setLayout(null);
 	
@@ -109,13 +130,28 @@ private void addMouseListeners()
 
 private void addApplyBtnListener()
 {
-	btnNewButton.addActionListener(new ActionListener() {
+	btnNewButtonTrans.addActionListener(new ActionListener() {
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try{
-			double tmp = Double.parseDouble(textField.getText());
-			prescaler = tmp;
+			double tmp = Double.parseDouble(textFieldTrans.getText());
+			prescalerTrans = tmp;
+			}catch(NumberFormatException e1)
+			{
+				e1.printStackTrace();
+				System.out.println("Wrong value for prescaler");
+			}				
+		}
+	});
+	
+	btnNewButtonRot.addActionListener(new ActionListener() {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try{
+			double tmp = Double.parseDouble(textFieldRot.getText());
+			prescalerRot = tmp;
 			}catch(NumberFormatException e1)
 			{
 				e1.printStackTrace();
@@ -173,8 +209,8 @@ class DrawingPanelListener extends MouseAdapter
 	private double[] calculateSpeed(Point e)
 	{
 		double [] res = new double[2];
-		res[0] = (double)(startPoint.y - e.y) * prescaler;
-		res[1] = (double)(e.x - startPoint.x) * prescaler;
+		res[0] = (double)(startPoint.y - e.y) * prescalerTrans;
+		res[1] = (double)(e.x - startPoint.x) * prescalerRot;
 		return res;
 	}
 	

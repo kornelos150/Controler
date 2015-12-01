@@ -4,11 +4,13 @@ import java.nio.charset.StandardCharsets;
 
 public class GeneralConverter {
 	
+	private static final double robotWidth = 1;
+	
 	public static double[] TranRot2LeftRight(double translation, double rotation)
 	{
 		double[] result = new double[2] ;
 		result[0] = translation + rotation;
-		result[1] = translation - rotation;
+		result[1] = (translation - rotation)/robotWidth;
 		return result;
 	}
 	

@@ -132,19 +132,7 @@ public class MainFrame extends JFrame {
 	private void menuInit()
 	{
 		menuBar = new JMenuBar();
-		
-		fileMenu = new JMenu("File");
-		menuBar.add(fileMenu);
-		load = new JMenuItem("Load config..");
-		fileMenu.add(load);
-		save = new JMenuItem("Save");
-		fileMenu.add(save);
-		saveAs = new JMenuItem("Save As..");
-		fileMenu.add(saveAs);
-		fileMenu.addSeparator();
-		scriptAcivator = new JMenuItem("Scipting..");
-		fileMenu.add(scriptAcivator);		
-		
+			
 		compMenu = new JMenu("Components");		
 		menuBar.add(compMenu);
 		
