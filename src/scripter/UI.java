@@ -16,9 +16,9 @@ import javax.swing.plaf.TabbedPaneUI;
 public class UI extends JFrame implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
-	public final static String NAME = "TextEditor";
+	private final static String NAME = "TextEditor";
 	
-	private JavaScriptInterpreter interpreter;
+	private IShellInterpreter interpreter;
 	
 	private JTabbedPane tabbedPane;
 	
@@ -181,7 +181,7 @@ public class UI extends JFrame implements ActionListener {
 		menuInit();
 		basicInit();
 		scripterPanelInit();
-		interpreter.setOutputScript(scriptOutput);
+		((JavaScriptInterpreter)interpreter).setOutputScript(scriptOutput);
 		
 		tabbedPane = new JTabbedPane();
 		//tabbedPane = new 

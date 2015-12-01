@@ -15,6 +15,7 @@ var czasTranslacji
 
 for(var i = 0; i < 4; ++i)
 {
-	RobotSetVel(2,0,10);
+	RobotSetVelWait(2,0,10);
+	RobotSetVelWait(2,0,10);
 }
 

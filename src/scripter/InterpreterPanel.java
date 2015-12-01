@@ -22,10 +22,10 @@ public class InterpreterPanel extends JPanel {
 	
 	private JTextArea shell;
 	private int _promptCursor = 0;
-	public String mainPrompt = ">> ";
+	private String mainPrompt = ">> ";
     private StringBuffer _commandBuffer = new StringBuffer();
     private IShellInterpreter interpreter;
-    public String contPrompt = "";    
+    private  String contPrompt = "";    
     private LinkedList<String> cmdHistory;
     private int cmdIndex;
 	

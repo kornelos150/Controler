@@ -38,9 +38,6 @@ public class MainFrame extends JFrame {
 	
 	private BTHandler btHandler;
 	
-	private LinkedList<BTObserver> setSpeedObs;
-	private LinkedList<BTObserver> getSpeedObs;
-	
 	private class ComponentPair{
 		public BaseTile component;
 		public JCheckBoxMenuItem menuItem;
